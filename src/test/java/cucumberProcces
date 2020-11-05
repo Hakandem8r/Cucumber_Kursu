@@ -1,0 +1,97 @@
+Maven Projesi oluşturma ve Cucumber Hazırlık
+1- Yeni Proje tıklatıldı -> Proje Tipinde Maven seçildi ve isim
+   verilerek sonuçlandırıldı.
+
+2- Klasör yapısı incelendi :
+   src un altında 2 adet klasör oluşturulduğu görüldü.
+
+   main -> Developer ın çalıştığı , programın web sitesinin yazıldığı yer.
+   test -> Tester ın çalıştığı yer.bütün test e ait dosyalarımız burada
+           olacak.
+
+3- Bu iki klasöre tıklatıldı, her ikisinde de java klasörü olduğu gözüktü
+   Developer üstteki klasörleri,
+   Tester ise test in altındaki java(yeşil) klasörünü
+   sanki kendi src klasörüymüş gibi kullanacak.
+
+   Intelij in    Mavi Klasore verdigi isim  -> Developer Sources Root
+                 Yesil Klasore verdigi isim -> Test Sources Root
+
+4- Tester Cucumber projesi için düzenli bir yapı ile çalışmak için,
+   kendisine ait java klasörüne aşağıdaki 4 klösörü açar.
+
+   Klasörler
+   FeatureFiles   -> senaryolarımızın olduğu klasör
+   StepDefinitions-> Senaryolara ait çalışan metodların olduğu klasör
+   Pages          -> Page Object Model e uyugn sayfaların WebElemnt
+                     ve bunlara ait metodların olduğu klasör.
+                     (@FindBy)
+   Utilities      -> driver la ilgili ve çok sık kullanılacak ortak
+                     metodların olduğu class ların olduğu klasör.
+
+
+5- File -> Settings -> Plugin yükleme kısmına gidiniz.
+
+6- Daha önce yüklediğiniz TextNG xml file plug ini gibi
+   aşağıdaki plugin leride install ediniz.
+
+   Cucumber for java  -> cucumber a ait dosylar ve çalışma mantığını
+                         editör kazansın diye.
+   Gherkin            -> yazacağım senaryoların konuşma diline yakın
+                         şekilde yazabilmemiz için ekleniyor.
+
+
+Plugin yükleme ekranından OK ye basarak ayrıldık.
+
+7- POM.xml dosyası zaten ekranda açıktı.
+
+   Projenizin hangi library (Kütüphane) lere ihtiyacı var ise,
+   onları bu dosyaya ekleyeceğiz.
+   Peki nelere ihtiyacımız var bir cucumber projesi çalıştırabilmek için?
+
+   -Selenium
+   -Cucumber
+   -testNG
+   -Cucumberla testNG birleştiren lib lazım
+   -WebDriver
+   -Yukarıdakileri JVM uyumu için bir 1.8 versiyona setleme yapacağız.
+
+   Şimdi yapalım:
+
+   Yükleme esnasında kırmızı yazı uyarıları ile karşılaşırsanız POM.xml içinde,
+   sağ tuş -> Maven -> Reload Project e tıklayarak yükleme işlemini
+
+   - yükleme esnasında kırmızı yazı uyarıları ile karşılaşırsanız POM.xml
+        içinde , sağ tuş -> Maven -> Reload Poject e tıklatarak
+        yüklem işlemini yapmasını sağlayınız.
+        1 dk sürebilir.
+      ------------------
+   Senaryo ;
+     1- siteyi açınız.
+     2- username ve password u gönderin ve Login butonuna tıklatın.
+     3- Login olduğunuzu doğrulayın.
+
+     - Sonra Yukarıdaki Senaryoyu Gherkin dilinde yazdık.
+
+   -----------------------------------------------------
+
+   You can implement missing steps with the snippets below:
+
+   @Given("^Navegate to basqar$")
+   public void navegate_to_basqar() throws Throwable {
+       // Write code here that turns the phrase above into concrete actions
+       throw new PendingException();
+   }
+
+   @When("^Enter username and password and click Login button$")
+   public void enter_username_and_password_and_click_Login_button() throws Throwable {
+       // Write code here that turns the phrase above into concrete actions
+       throw new PendingException();
+   }
+
+   @Then("^User should login succesfully$")
+   public void user_should_login_succesfully() throws Throwable {
+       // Write code here that turns the phrase above into concrete actions
+       throw new PendingException();
+   }
+

@@ -1,0 +1,146 @@
+1- Yeni Çoklu WebDriver üretebilen Driver Class ı yazıldı.
+    package Utilities;
+
+    import io.github.bonigarcia.wdm.WebDriverManager;
+    import org.openqa.selenium.WebDriver;
+    import org.openqa.selenium.chrome.ChromeDriver;
+    import org.openqa.selenium.chrome.ChromeDriverService;
+    import org.openqa.selenium.firefox.FirefoxDriver;
+
+    public class Driver {
+
+        /**
+         * Interview Sorusu
+         * Singleton driver nedir?
+         * Bütün projede aynı ve tek bir driverın kullanılmasıdır.
+         */
+
+        // Siz Bütün dersler için sınav kağıtları hazırlayan bir yöneticisiniz.
+        // 1.Öğrenci geldi, sizden fizik dersi yazılı sorularını istedi. verdiniz.
+        // 2.Öğrenci geldi, sizden kimya dersi yazılı sorularını istedi. verdiniz.
+        // 3.Öğrenci geldi sizden yine Fizik yazılı soruları istedi, siz yeni soru hazırlamazsınız.
+        //    aynı fizik sorularından vermelisiniz.
+        // 4.Öğrenci geldi sizden kimya yazlı soruları istedi.Yeni soru hazılamazsını yine daha önce
+        //    hazırladığınız Kimya sorularını verirsiniz.
+        // Böylece ilk talep için daha önce yok ise yeni oluşturusunuz, ancak aynı talep tekrar gelirse
+        // daha önce oluşturulmuşu vermeniz gerekir.
+        // burda öğrencileri CLASS a yani Senaryolara benzetebiliriz. Sınav kağıtları ise DRİVER dır.
+
+        // Her farklı browser için farklı bir static değişken havuzu oluşturduk.
+        private static ThreadLocal<WebDriver> threadDriver=new ThreadLocal<>();
+            public static ThreadLocal<String> threadBrowserName=new ThreadLocal<>();
+
+        public static WebDriver getDriver()
+        {
+            // eğer browser adı gelmezse
+            if (threadBrowserName.get()==null)
+            {
+                threadBrowserName.set("chrome");
+            }
+
+            if (threadDriver.get() == null)
+            {
+                switch (threadBrowserName.get())
+                {
+                    case "firefox":
+                        WebDriverManager.firefoxdriver().setup();
+                        threadDriver.set( new FirefoxDriver() );
+                        break;
+
+                    default:
+                        WebDriverManager.chromedriver().setup();
+                        threadDriver.set( new ChromeDriver() );
+                        break;
+
+                }
+            }
+            return threadDriver.get();
+        }
+
+        public static void quitDriver()
+        {
+            if (threadDriver.get() != null)
+            {
+                threadDriver.get().quit(); // ilgili driverdan quit edildi
+                WebDriver driver=threadDriver.get(); // threadLocl deki ilgili driverının referansı alındı.
+                driver=null;  // null değeri atanarak boşaltıldı.
+                threadDriver.set(driver); // ve set edilerek ThreadLocal in içindeki saklanan null hale getirildi.
+            }
+        }
+
+
+
+    }
+
+
+
+2- Browser adı verilmeli : Bunun için Runner Class olarak yeni oluşturğumuz clasın içine AfterClass
+   metodu gibi BeforeClass metodu oluşturularak XML den gelecek browsername set edildi.
+
+   package Runners;
+
+
+   import Utilities.Driver;
+   import com.cucumber.listener.Reporter;
+   import cucumber.api.CucumberOptions;
+   import cucumber.api.testng.AbstractTestNGCucumberTests;
+   import org.testng.annotations.AfterClass;
+   import org.testng.annotations.BeforeClass;
+   import org.testng.annotations.Parameters;
+
+   @CucumberOptions(
+           tags = {"@RegressionTest"},
+           features = {"src/test/java/FeatureFiles"},
+           glue = {"StepDefinitions"},
+           dryRun = false,
+           plugin = {
+                   "com.cucumber.listener.ExtentCucumberFormatter:target/ExtentReport/ExtentReportRegression.html"
+                   // oluşturalacak raporun yeri ve adı veriliyor.
+           }
+   )
+   public class _06_TestRunnerCrossBrowser extends AbstractTestNGCucumberTests {
+
+       @BeforeClass
+       @Parameters("browser")
+       public static void beforeClass(String browser)
+       {
+           Driver.threadBrowserName.set(browser);
+       }
+
+       @AfterClass
+       public static void afterClass()
+       {
+           // ayarlar alındı, cucumber extend reporttan haberi oldu
+           Reporter.loadXMLConfig("src/test/java/XMLFiles/extendReportSet.xml");
+           Reporter.setSystemInfo("User Name", "İsmet Temur");
+           Reporter.setSystemInfo("Application Name", "Basqar");
+           Reporter.setSystemInfo("Operating System Info", System.getProperty("os.name"));
+           Reporter.setSystemInfo("Department", "QA");
+           Reporter.setSystemInfo("Ek satır Adı", "Satır açıklaması");
+           Reporter.setTestRunnerOutput("Test excetuion Cucumber report");
+       }
+
+   }
+
+
+3- Şimdi Daha önce TestNG de yaptığımız paralel çalıştırabilecen XML files ı aynen aldık
+   ve çalışacak Class ı yukarıda oluşturduğumuz Runner Class ın ismini verdik.
+
+   <suite name="suit1"  parallel="tests" thread-count="2">
+
+       <test name="test1">
+           <parameter name="browser" value="chrome"></parameter>
+           <classes>
+               <class name="Runners._06_TestRunnerCrossBrowser"></class>
+           </classes>
+       </test>
+
+
+       <test name="test2">
+           <parameter name="browser" value="firefox"></parameter>
+           <classes>
+               <class name="Runners._06_TestRunnerCrossBrowser"></class>
+           </classes>
+       </test>
+
+   </suite>
